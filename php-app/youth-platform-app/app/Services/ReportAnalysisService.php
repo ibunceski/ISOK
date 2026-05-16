@@ -20,9 +20,9 @@ class ReportAnalysisService
     {
         $analysis = $this->aiClient->analyze($content);
 
-        $riskLevel = $this->mapRiskLevel($analysis['risk_level'] ?? 'low');
+        $urgencyScore = $analysis['score'] ?? 0.0;
+        $riskLevel = $this->mapRiskLevel($urgencyScore);
         $category = $analysis['category'] ?? null;
-        $urgencyScore = $analysis['urgency_score'] ?? null;
         $isPriority = in_array($riskLevel, ['HIGH', 'CRITICAL']);
 
         $dto = new ReportDTO(
@@ -39,14 +39,28 @@ class ReportAnalysisService
         return $dto;
     }
 
-    protected function mapRiskLevel(string $level): string
+    protected function mapRiskLevel(float $score): string
     {
-        $level = strtolower($level);
-        return match ($level) {
-            'critical' => 'CRITICAL',
-            'high' => 'HIGH',
-            'medium' => 'MEDIUM',
-            default => 'LOW',
-        };
+        // clamp score into 0.0 .. 1.0
+        if ($score < 0.0) {
+            $score = 0.0;
+        } elseif ($score > 1.0) {
+            $score = 1.0;
+        }
+
+        // > 0.95 is considered urgent / critical
+        if ($score > 0.95) {
+            return 'CRITICAL';
+        }
+
+        if ($score >= 0.75) {
+            return 'HIGH';
+        }
+
+        if ($score >= 0.4) {
+            return 'MEDIUM';
+        }
+
+        return 'LOW';
     }
 }
