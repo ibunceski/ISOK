@@ -6,5 +6,5 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 
 class ThrottleReports extends ThrottleRequests
 {
-    // Uses Laravel's built‑in throttle logic.
+    // Inherits Laravel's throttle functionality.
 }

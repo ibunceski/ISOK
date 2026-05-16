@@ -20,7 +20,7 @@ class ReportAnalysisService
     {
         $analysis = $this->aiClient->analyze($content);
 
-        $urgencyScore = $analysis['score'] ?? 0.0;
+        $urgencyScore = $analysis['urgency_score'] ?? $analysis['score'] ?? 0.0;
         $riskLevel = $this->mapRiskLevel($urgencyScore);
         $category = $analysis['category'] ?? null;
         $isPriority = in_array($riskLevel, ['HIGH', 'CRITICAL']);
@@ -41,14 +41,8 @@ class ReportAnalysisService
 
     protected function mapRiskLevel(float $score): string
     {
-        // clamp score into 0.0 .. 1.0
-        if ($score < 0.0) {
-            $score = 0.0;
-        } elseif ($score > 1.0) {
-            $score = 1.0;
-        }
+        $score = max(0.0, min(1.0, $score));
 
-        // > 0.95 is considered urgent / critical
         if ($score > 0.95) {
             return 'CRITICAL';
         }

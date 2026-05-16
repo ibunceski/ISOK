@@ -1,19 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Report List</title>
-    <meta charset="utf-8">
-    <style>
-        body {font-family: Arial, sans-serif; margin: 2rem;}
-        table {width: 100%; border-collapse: collapse;}
-        th, td {border: 1px solid #ddd; padding: 8px; text-align: left;}
-        tr.priority {background-color: #ffdddd;}
-    </style>
-</head>
-<body>
-    <h1>Submitted Reports</h1>
-    <a href="{{ route('reports.create') }}">Submit New Report</a>
-    <br><br>
+<x-layouts.app title="Report List">
+    <h2>Submitted Reports</h2>
+
     <table>
         <thead>
             <tr>
@@ -27,23 +14,28 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($reports as $report)
+            @forelse ($reports as $report)
                 @php
                     $rowClass = in_array($report->risk_level, ['HIGH', 'CRITICAL']) ? 'priority' : '';
                 @endphp
                 <tr class="{{ $rowClass }}">
                     <td>{{ $report->id }}</td>
-                    <td>{{ Str::limit($report->content, 50) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($report->content, 60) }}</td>
                     <td>{{ $report->risk_level }}</td>
                     <td>{{ $report->category ?? '-' }}</td>
-                    <td>{{ $report->urgency_score ?? '-' }}</td>
+                    <td>{{ $report->urgency_score !== null ? number_format($report->urgency_score, 2) : '-' }}</td>
                     <td>{{ $report->is_priority ? 'YES' : 'NO' }}</td>
                     <td>{{ $report->created_at->format('Y-m-d H:i') }}</td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7">No reports found.</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 
-    {{ $reports->links() }}
-</body>
-</html>
+    <div style="margin-top:1rem;">
+        {{ $reports->links() }}
+    </div>
+</x-layouts.app>
