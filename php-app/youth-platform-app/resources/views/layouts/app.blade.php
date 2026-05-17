@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
+    <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -18,24 +18,45 @@
                         </svg>
                         <span class="text-xl font-bold text-gray-900">Youth Safety</span>
                     </a>
-                </div>
-                
-                <div class="flex items-center space-x-4">
+                    
                     @auth
                         @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                Dashboard
-                            </a>
+                            <div class="hidden md:ml-8 md:flex md:space-x-6">
+                                <a href="{{ route('admin.dashboard') }}" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                    Dashboard
+                                </a>
+                                <a href="{{ route('admin.reports.index') }}" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                    Reports
+                                </a>
+                            </div>
                         @endif
+                    @else
+                        <div class="hidden md:ml-8 md:flex md:space-x-6">
+                            <a href="{{ route('reports.create') }}" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                Submit Report
+                            </a>
+                        </div>
+                    @endauth
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    @auth
+                        <span class="text-sm text-gray-600 hidden sm:inline">{{ auth()->user()->name }}</span>
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <button type="submit" class="text-gray-600 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                 Logout
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                            Login
+                        <a href="{{ route('reports.create') }}" class="md:hidden text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Submit Report
+                        </a>
+                        <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            Admin Login
                         </a>
                     @endauth
                 </div>
@@ -67,7 +88,7 @@
     @endif
 
     <!-- Main Content -->
-    <main class="py-8">
+    <main class="">
         @yield('content')
     </main>
 
@@ -79,5 +100,7 @@
             </p>
         </div>
     </footer>
+    
+    @stack('scripts')
 </body>
 </html>
