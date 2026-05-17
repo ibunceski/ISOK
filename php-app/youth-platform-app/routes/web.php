@@ -23,6 +23,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/reports/{id}', [DashboardController::class, 'showReport'])->name('reports.show');
     Route::post('/reports/{id}/archive', [DashboardController::class, 'archiveReport'])->name('reports.archive');
     Route::post('/reports/{id}/unarchive', [DashboardController::class, 'unarchiveReport'])->name('reports.unarchive');
+    Route::post('/reports/{id}/respond', [DashboardController::class, 'sendResponse'])->name('reports.respond');
     Route::get('/reports', function() {
         return redirect()->route('admin.dashboard');
     })->name('reports.index');

@@ -162,7 +162,7 @@
                             };
                             $isHighRisk = in_array($report->risk_level, ['HIGH', 'CRITICAL']);
                         @endphp
-                        <tr class="{{ $isHighRisk ? 'bg-red-50' : '' }} hover:bg-gray-50 transition-colors">
+                        <tr class="{{ $isHighRisk ? 'bg-red-50' : '' }} {{ $report->isArchived() ? 'opacity-60' : '' }} hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 #{{ $report->id }}
                             </td>
@@ -178,6 +178,11 @@
                                     @endif
                                     {{ $report->risk_level }}
                                 </span>
+                                @if($report->isArchived())
+                                    <span class="inline-flex items-center ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                        Archived
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $report->category ?? '-' }}

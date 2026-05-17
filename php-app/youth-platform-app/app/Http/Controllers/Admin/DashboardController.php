@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Report;
 use App\Repositories\ReportRepository;
+use App\Services\ChatService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -11,10 +13,12 @@ use Illuminate\View\View;
 class DashboardController extends Controller
 {
     protected ReportRepository $repository;
+    protected ChatService $chatService;
 
-    public function __construct(ReportRepository $repository)
+    public function __construct(ReportRepository $repository, ChatService $chatService)
     {
         $this->repository = $repository;
+        $this->chatService = $chatService;
     }
 
     /**
@@ -45,7 +49,9 @@ class DashboardController extends Controller
             abort(404, 'Report not found');
         }
 
-        return view('admin.report-show', compact('report'));
+        $messages = $this->chatService->getReportMessages($report);
+
+        return view('admin.report-show', compact('report', 'messages'));
     }
 
     /**
@@ -68,5 +74,31 @@ class DashboardController extends Controller
 
         return redirect()->route('admin.dashboard')
             ->with('success', 'Report unarchived successfully.');
+    }
+
+    /**
+     * Send admin response to a report.
+     */
+    public function sendResponse(Request $request, int $reportId): RedirectResponse
+    {
+        $validated = $request->validate([
+            'content' => 'required|string|min:1|max:1000',
+        ]);
+
+        $report = $this->repository->findById($reportId);
+
+        if (!$report) {
+            return redirect()->back()
+                ->with('error', 'Report not found.');
+        }
+
+        $this->chatService->adminRespond(
+            $report,
+            auth()->id(),
+            $validated['content']
+        );
+
+        return redirect()->back()
+            ->with('success', 'Response sent successfully.');
     }
 }
