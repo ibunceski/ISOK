@@ -1,49 +1,25 @@
-```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-dist/
-build/
-
+```gitignore
 # Dependencies
 vendor/
-node_modules/
-composer.lock
 
-# Logs and temp files
+# Logs
 *.log
-*.tmp
-*.swp
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Editors
+# IDE
 .vscode/
 .idea/
 
-# Laravel-specific
-bootstrap/cache/
-storage/logs/
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
-public/storage/
-
-# PHP-specific
-*.php~
-.htaccess
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
+
+# PHP specific
+*.swp
+*.swo
+*.tmp
 ```

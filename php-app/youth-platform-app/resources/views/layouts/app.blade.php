@@ -88,7 +88,7 @@
     @endif
 
     <!-- Main Content -->
-    <main class="">
+    <main class="py-8">
         @yield('content')
     </main>
 
