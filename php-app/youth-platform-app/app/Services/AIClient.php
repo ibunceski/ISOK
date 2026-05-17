@@ -22,7 +22,7 @@ class AIClient
     public function analyze(string $text): ?array
     {
         try {
-            $response = Http::retry($this->retries, 100)
+            $response = Http::retry($this->retries, 20000)
                 ->timeout($this->timeout)
                 ->post($this->endpoint, ['text' => $text]);
 

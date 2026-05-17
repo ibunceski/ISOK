@@ -18,7 +18,7 @@
                         </svg>
                         <span class="text-xl font-bold text-gray-900">Youth Safety</span>
                     </a>
-                    
+
                     @auth
                         @if(auth()->user()->isAdmin())
                             <div class="hidden md:ml-8 md:flex md:space-x-6">
@@ -100,7 +100,7 @@
             </p>
         </div>
     </footer>
-    
+
     @stack('scripts')
 </body>
 </html>

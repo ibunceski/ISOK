@@ -13,6 +13,7 @@ class ReportRepository
     public function create(ReportDTO $dto): Report
     {
         return Report::create([
+            'anonymous_tag' => $dto->anonymousTag,
             'content' => $dto->content,
             'risk_level' => $dto->riskLevel,
             'category' => $dto->category,
@@ -24,7 +25,8 @@ class ReportRepository
 
     public function allSortedByPriority(): LengthAwarePaginator
     {
-        return Report::orderByDesc('is_priority')
+        return Report::whereNull('archived_at')
+            ->orderByDesc('is_priority')
             ->orderByDesc('urgency_score')
             ->orderByDesc('created_at')
             ->paginate(15);
@@ -35,7 +37,7 @@ class ReportRepository
      */
     public function filterAndPaginate(array $filters = []): LengthAwarePaginator
     {
-        $query = Report::query();
+        $query = Report::whereNull('archived_at');
 
         if (!empty($filters['search'])) {
             $searchTerm = '%' . $filters['search'] . '%';
@@ -65,7 +67,7 @@ class ReportRepository
     public function getStats(): array
     {
         $totalReports = Report::count();
-        
+
         $riskCounts = Report::selectRaw('risk_level, COUNT(*) as count')
             ->groupBy('risk_level')
             ->pluck('count', 'risk_level');
@@ -107,5 +109,23 @@ class ReportRepository
             ->pluck('category')
             ->sort()
             ->values();
+    }
+
+    /**
+     * Archive a report.
+     */
+    public function archive(int $id): bool
+    {
+        $report = Report::find($id);
+        return $report ? $report->archive() : false;
+    }
+
+    /**
+     * Unarchive a report.
+     */
+    public function unarchive(int $id): bool
+    {
+        $report = Report::withTrashed()->find($id);
+        return $report ? $report->unarchive() : false;
     }
 }

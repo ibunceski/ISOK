@@ -27,6 +27,7 @@ class ReportController extends Controller
         return response()->json([
             'message' => 'Report submitted successfully',
             'data' => [
+                'anonymous_tag' => $dto->anonymousTag,
                 'risk_level' => $dto->riskLevel,
                 'category' => $dto->category,
                 'urgency_score' => $dto->urgencyScore,

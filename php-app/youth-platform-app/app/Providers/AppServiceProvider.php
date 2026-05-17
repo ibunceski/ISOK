@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Repositories\ReportRepository;
 use App\Services\AIClient;
+use App\Services\ChatService;
 use App\Services\ReportAnalysisService;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,7 +23,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ReportAnalysisService::class, function ($app) {
             return new ReportAnalysisService(
                 $app->make(AIClient::class),
-                $app->make(ReportRepository::class)
+                $app->make(ReportRepository::class),
+                $app->make(ChatService::class)
             );
         });
     }

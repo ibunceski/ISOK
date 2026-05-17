@@ -21,6 +21,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/reports/{id}', [DashboardController::class, 'showReport'])->name('reports.show');
+    Route::post('/reports/{id}/archive', [DashboardController::class, 'archiveReport'])->name('reports.archive');
+    Route::post('/reports/{id}/unarchive', [DashboardController::class, 'unarchiveReport'])->name('reports.unarchive');
     Route::get('/reports', function() {
         return redirect()->route('admin.dashboard');
     })->name('reports.index');
