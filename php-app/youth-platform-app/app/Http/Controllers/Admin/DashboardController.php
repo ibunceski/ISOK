@@ -30,6 +30,7 @@ class DashboardController extends Controller
             'search' => $request->get('search', ''),
             'risk_level' => $request->get('risk_level', ''),
             'category' => $request->get('category', ''),
+            'show_archived' => $request->has('show_archived'),
         ];
 
         $reports = $this->repository->filterAndPaginate($filters);

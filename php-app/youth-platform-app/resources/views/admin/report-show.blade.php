@@ -71,8 +71,16 @@
                     @endif
                 </div>
 
-                <!-- Archive/Unarchive Actions -->
-                <div class="flex items-center space-x-2">
+                <!-- Chat and Archive/Unarchive Actions -->
+                <div class="flex items-center space-x-2 flex-wrap gap-2">
+                    <!-- Chat Button -->
+                    <a href="#chat-messages" onclick="document.getElementById('chat-messages').scrollIntoView({behavior: 'smooth'}); document.getElementById('message-content').focus(); return false;" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        Chat with User
+                    </a>
+
                     @if($report->isArchived())
                         <form method="POST" action="{{ route('admin.reports.unarchive', $report->id) }}" class="inline">
                             @csrf
@@ -119,8 +127,8 @@
                     @if($report->urgency_score !== null)
                         <div class="flex items-center">
                             <div class="flex-1 bg-gray-200 rounded-full h-3 mr-3">
-                                <div 
-                                    class="h-3 rounded-full {{ $report->urgency_score >= 0.7 ? 'bg-red-500' : ($report->urgency_score >= 0.4 ? 'bg-yellow-500' : 'bg-green-500') }}" 
+                                <div
+                                    class="h-3 rounded-full {{ $report->urgency_score >= 0.7 ? 'bg-red-500' : ($report->urgency_score >= 0.4 ? 'bg-yellow-500' : 'bg-green-500') }}"
                                     style="width: {{ min(100, $report->urgency_score * 100) }}%"
                                 ></div>
                             </div>
@@ -188,17 +196,17 @@
                 <div class="px-6 py-4 bg-white border-t border-gray-200">
                     <form method="POST" action="{{ route('admin.reports.respond', $report->id) }}" class="flex space-x-3">
                         @csrf
-                        <input 
-                            type="text" 
-                            name="content" 
+                        <input
+                            type="text"
+                            name="content"
                             id="message-content"
-                            placeholder="Type your message to provide help and support..." 
+                            placeholder="Type your message to provide help and support..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                             required
                             maxlength="1000"
                         >
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors flex items-center"
                         >
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -15,8 +15,8 @@ class AIClient
     public function __construct()
     {
         $this->endpoint = config('services.ai.analyze_url', 'http://127.0.0.1:8000/analyze');
-        $this->timeout = 5;
-        $this->retries = 2;
+        $this->timeout = 3;
+        $this->retries = 1;
     }
 
     public function analyze(string $text): ?array

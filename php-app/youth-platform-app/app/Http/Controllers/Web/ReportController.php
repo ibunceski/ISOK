@@ -25,4 +25,9 @@ class ReportController extends Controller
     {
         return view('reports.create');
     }
+
+    public function success(): View
+    {
+        return view('reports.success');
+    }
 }

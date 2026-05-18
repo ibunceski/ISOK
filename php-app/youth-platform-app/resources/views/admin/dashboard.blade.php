@@ -87,13 +87,13 @@
 
     <!-- Search and Filter -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <form method="GET" action="{{ route('admin.dashboard') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form method="GET" action="{{ route('admin.dashboard') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div class="md:col-span-2">
                 <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                <input 
-                    type="text" 
-                    id="search" 
-                    name="search" 
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
                     value="{{ $filters['search'] }}"
                     placeholder="Search by content or category..."
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -101,8 +101,8 @@
             </div>
             <div>
                 <label for="risk_level" class="block text-sm font-medium text-gray-700 mb-1">Risk Level</label>
-                <select 
-                    id="risk_level" 
+                <select
+                    id="risk_level"
                     name="risk_level"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
@@ -113,16 +113,29 @@
                     <option value="LOW" {{ $filters['risk_level'] === 'LOW' ? 'selected' : '' }}>Low</option>
                 </select>
             </div>
-            <div class="flex items-end">
-                <button 
-                    type="submit" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+            <div class="flex items-end gap-2">
+                <button
+                    type="submit"
+                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
                 >
                     Filter
                 </button>
             </div>
+            <div class="flex items-center md:col-span-5">
+                <input
+                    type="checkbox"
+                    id="show_archived"
+                    name="show_archived"
+                    value="1"
+                    {{ request('show_archived') ? 'checked' : '' }}
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                >
+                <label for="show_archived" class="ml-2 text-sm font-medium text-gray-700 cursor-pointer">
+                    Show Archived Reports
+                </label>
+            </div>
         </form>
-        @if($filters['search'] || $filters['risk_level'])
+        @if($filters['search'] || $filters['risk_level'] || request('show_archived'))
             <div class="mt-4">
                 <a href="{{ route('admin.dashboard') }}" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
                     &larr; Clear all filters
@@ -191,8 +204,8 @@
                                 @if($report->urgency_score !== null)
                                     <div class="flex items-center">
                                         <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                                            <div 
-                                                class="h-2 rounded-full {{ $report->urgency_score >= 0.7 ? 'bg-red-500' : ($report->urgency_score >= 0.4 ? 'bg-yellow-500' : 'bg-green-500') }}" 
+                                            <div
+                                                class="h-2 rounded-full {{ $report->urgency_score >= 0.7 ? 'bg-red-500' : ($report->urgency_score >= 0.4 ? 'bg-yellow-500' : 'bg-green-500') }}"
                                                 style="width: {{ min(100, $report->urgency_score * 100) }}%"
                                             ></div>
                                         </div>
@@ -217,10 +230,37 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $report->created_at->format('M d, Y H:i') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.reports.show', $report->id) }}" class="text-blue-600 hover:text-blue-900">
-                                    View
-                                </a>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <a href="{{ route('admin.reports.show', $report->id) }}" class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors">
+                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        View
+                                    </a>
+                                    @if($report->isArchived())
+                                        <form method="POST" action="{{ route('admin.reports.unarchive', $report->id) }}" class="inline" onsubmit="return confirm('Unarchive this report?')">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded transition-colors">
+                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                                                </svg>
+                                                Restore
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form method="POST" action="{{ route('admin.reports.archive', $report->id) }}" class="inline" onsubmit="return confirm('Archive this report?')">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium rounded transition-colors">
+                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                                </svg>
+                                                Archive
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

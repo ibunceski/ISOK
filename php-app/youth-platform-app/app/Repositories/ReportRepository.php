@@ -37,7 +37,12 @@ class ReportRepository
      */
     public function filterAndPaginate(array $filters = []): LengthAwarePaginator
     {
-        $query = Report::whereNull('archived_at');
+        $query = Report::query();
+
+        // Handle archived reports visibility
+        if (empty($filters['show_archived'])) {
+            $query->whereNull('archived_at');
+        }
 
         if (!empty($filters['search'])) {
             $searchTerm = '%' . $filters['search'] . '%';

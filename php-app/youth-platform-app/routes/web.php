@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Route;
 // Public routes - accessible without authentication
 Route::get('/', [ReportController::class, 'create'])->name('reports.create');
 Route::post('/reports', [App\Http\Controllers\Api\ReportController::class, 'store'])->name('reports.store');
+Route::get('/reports/success', [ReportController::class, 'success'])->name('reports.success');
+
+// Chat routes for reporters
+Route::get('/chat/{tag}', [App\Http\Controllers\Web\ChatController::class, 'view'])->name('chat.view');
+Route::post('/chat/{tag}/message', [App\Http\Controllers\Api\ChatController::class, 'sendMessage'])->name('chat.send');
 
 // Authentication routes
 Route::middleware('guest')->group(function () {

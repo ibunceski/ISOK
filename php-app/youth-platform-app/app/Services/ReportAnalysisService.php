@@ -66,6 +66,11 @@ class ReportAnalysisService
         // We don't want 'safe_baseline' to be flagged as an incident category
         unset($categories['safe_baseline']);
 
+        // After removing safe_baseline, check if there are any categories left
+        if (empty($categories)) {
+            return null;
+        }
+
         $maxScore = max($categories);
 
         // If the highest risk score is basically 0, there is no threat category

@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReportRequest;
 use App\Services\ReportAnalysisService;
-use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\RedirectResponse;
 
 class ReportController extends Controller
 {
@@ -17,22 +16,19 @@ class ReportController extends Controller
         $this->service = $service;
     }
 
-    public function store(StoreReportRequest $request): JsonResponse
+    public function store(StoreReportRequest $request): RedirectResponse
     {
         $dto = $this->service->process(
             $request->validated()['content'],
             $request->ip()
         );
 
-        return response()->json([
-            'message' => 'Report submitted successfully',
-            'data' => [
-                'anonymous_tag' => $dto->anonymousTag,
-                'risk_level' => $dto->riskLevel,
-                'category' => $dto->category,
-                'urgency_score' => $dto->urgencyScore,
-                'is_priority' => $dto->isPriority,
-            ],
-        ], Response::HTTP_CREATED);
+        return redirect()->route('reports.success')->with([
+            'anonymous_tag' => $dto->anonymousTag,
+            'risk_level' => $dto->riskLevel,
+            'category' => $dto->category,
+            'urgency_score' => $dto->urgencyScore,
+            'is_priority' => $dto->isPriority,
+        ]);
     }
 }
