@@ -1,101 +1,167 @@
 @extends('layouts.app')
 
-@section('title', 'Report Chat - Youth Safety Platform')
+@section('title', 'Chat Support - Youth Safety Platform')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Chat Header -->
-        <div class="bg-white rounded-t-xl shadow-md border-b border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-2">
-                <h1 class="text-2xl font-bold text-gray-900">Chat with Our Support Team</h1>
+        <div class="bg-white/80 backdrop-blur-sm rounded-t-2xl shadow-lg border-b border-gray-200/50 p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        Chat with Our Support Team
+                    </h1>
+                    <p class="text-gray-600 mt-1 text-sm sm:text-base">You're not alone. We're here to help.</p>
+                </div>
                 <button
                     type="button"
                     onclick="copyToClipboard('{{ $tag }}')"
-                    class="text-sm bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 transition-colors"
+                    class="group flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2.5 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 >
-                    📋 Copy ID: {{ $tag }}
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-7M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                    </svg>
+                    <span class="font-medium">Copy ID: {{ $tag }}</span>
                 </button>
             </div>
-            <div class="flex items-center gap-4 text-sm text-gray-600">
-                <div class="flex items-center">
-                    <span class="font-medium mr-2">Your Anonymous ID:</span>
-                    <code class="bg-gray-100 px-3 py-1 rounded font-mono font-bold">{{ $tag }}</code>
+            
+            <div class="flex flex-wrap items-center gap-4 text-sm">
+                <div class="flex items-center gap-2 bg-gray-100/80 px-4 py-2 rounded-lg">
+                    <span class="font-medium text-gray-700">Your Anonymous ID:</span>
+                    <code class="bg-white px-3 py-1.5 rounded-md font-mono font-bold text-blue-600 border border-blue-200">{{ $tag }}</code>
                 </div>
-                <div class="flex items-center">
-                    <span class="font-medium mr-2">Report Status:</span>
+                <div class="flex items-center gap-2">
+                    <span class="font-medium text-gray-700">Report Status:</span>
                     @php
-                        $statusColor = match($report->risk_level) {
-                            'CRITICAL' => 'text-red-600 bg-red-50',
-                            'HIGH' => 'text-orange-600 bg-orange-50',
-                            'MEDIUM' => 'text-yellow-600 bg-yellow-50',
-                            'LOW' => 'text-green-600 bg-green-50',
-                            default => 'text-gray-600 bg-gray-50',
+                        $statusConfig = match($report->risk_level) {
+                            'CRITICAL' => ['color' => 'text-red-700', 'bg' => 'bg-red-100', 'border' => 'border-red-300', 'pulse' => true],
+                            'HIGH' => ['color' => 'text-orange-700', 'bg' => 'bg-orange-100', 'border' => 'border-orange-300', 'pulse' => true],
+                            'MEDIUM' => ['color' => 'text-yellow-700', 'bg' => 'bg-yellow-100', 'border' => 'border-yellow-300', 'pulse' => false],
+                            'LOW' => ['color' => 'text-green-700', 'bg' => 'bg-green-100', 'border' => 'border-green-300', 'pulse' => false],
+                            default => ['color' => 'text-gray-700', 'bg' => 'bg-gray-100', 'border' => 'border-gray-300', 'pulse' => false],
                         };
                     @endphp
-                    <span class="px-3 py-1 rounded font-medium {{ $statusColor }}">{{ $report->risk_level }}</span>
+                    <span class="px-3 py-1.5 rounded-lg font-semibold {{ $statusConfig['color'] }} {{ $statusConfig['bg'] }} border {{ $statusConfig['border'] }} {{ $statusConfig['pulse'] ? 'animate-pulse' : '' }}">
+                        {{ $report->risk_level }}
+                    </span>
                 </div>
             </div>
         </div>
 
         <!-- Chat Container -->
-        <div class="bg-white rounded-b-xl shadow-md overflow-hidden flex flex-col" style="height: 600px;">
+        <div class="bg-white/80 backdrop-blur-sm rounded-b-2xl shadow-lg overflow-hidden flex flex-col" style="height: 650px;">
             <!-- Messages Area -->
-            <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth">
                 @forelse($messages as $message)
-                    <div class="flex {{ $message->sender_type === 'admin' ? 'justify-start' : 'justify-end' }}">
-                        <div class="max-w-xs lg:max-w-md {{ $message->sender_type === 'admin' ? 'bg-gray-100 text-gray-900' : 'bg-blue-600 text-white' }} rounded-lg p-4">
-                            @if($message->sender_type === 'admin')
-                                <p class="text-xs font-semibold text-gray-600 mb-1">👤 Support Team</p>
-                            @else
-                                <p class="text-xs font-semibold opacity-75 mb-1">You</p>
-                            @endif
-                            <p class="text-sm">{{ $message->content }}</p>
-                            <p class="text-xs {{ $message->sender_type === 'admin' ? 'text-gray-500' : 'text-blue-200' }} mt-2">
-                                {{ $message->created_at->format('H:i') }}
-                            </p>
+                    <div class="flex {{ $message->sender_type === 'admin' ? 'justify-start' : 'justify-end' }} animate-fade-in">
+                        <div class="max-w-xs sm:max-w-sm lg:max-w-md {{ $message->sender_type === 'admin' ? 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 border border-gray-200' : 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md' }} rounded-2xl p-4 transition-all duration-200 hover:shadow-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                @if($message->sender_type === 'admin')
+                                    <div class="w-6 h-6 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-xs font-semibold text-purple-600">Support Team</span>
+                                @else
+                                    <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-xs font-semibold text-white/90">You</span>
+                                @endif
+                                <span class="text-xs {{ $message->sender_type === 'admin' ? 'text-gray-500' : 'text-blue-100' }}">
+                                    {{ $message->created_at->format('H:i') }}
+                                </span>
+                            </div>
+                            <p class="text-sm leading-relaxed">{{ $message->content }}</p>
                         </div>
                     </div>
                 @empty
                     <div class="flex items-center justify-center h-full">
-                        <div class="text-center">
-                            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                            </svg>
-                            <h3 class="text-gray-500 font-medium mb-1">No messages yet</h3>
-                            <p class="text-gray-400 text-sm">Our team will respond to your report soon. Send a message to provide additional details.</p>
+                        <div class="text-center max-w-md px-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-gray-700 font-semibold text-lg mb-2">No messages yet</h3>
+                            <p class="text-gray-500 text-sm">Our trained support team will respond to your report soon. Feel free to send a message with any additional details that might help us assist you better.</p>
                         </div>
                     </div>
                 @endforelse
+                
+                <!-- Loading indicator (hidden by default) -->
+                <div id="loading-indicator" class="hidden flex justify-start animate-fade-in">
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-2xl p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-6 h-6 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold text-purple-600">Support Team</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Divider -->
-            <div class="border-t border-gray-200"></div>
+            <!-- Typing indicator (hidden by default) -->
+            <div id="typing-indicator" class="hidden px-6 pb-2">
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <div class="flex gap-1">
+                        <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
+                        <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style="animation-delay: 200ms;"></div>
+                        <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style="animation-delay: 400ms;"></div>
+                    </div>
+                    <span>Support team is typing...</span>
+                </div>
+            </div>
 
             <!-- Message Input Form -->
-            <div class="p-4 bg-gray-50">
-                <form id="chat-form" onsubmit="sendMessage(event, '{{ $tag }}')">
+            <div class="border-t border-gray-200/50 p-4 bg-white/50 backdrop-blur-sm">
+                <form id="chat-form" onsubmit="sendMessage(event, '{{ $tag }}')" class="flex gap-3">
                     @csrf
-                    <div class="flex gap-3">
+                    <div class="flex-1 relative">
                         <textarea
                             id="message-input"
                             name="content"
                             rows="1"
-                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                            class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none bg-white placeholder-gray-400 hover:border-gray-300"
                             placeholder="Type your message here..."
-                            style="max-height: 100px; min-height: 45px;"
+                            style="max-height: 120px; min-height: 48px;"
                         ></textarea>
-                        <button
-                            type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 flex-shrink-0"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                            </svg>
-                            Send
-                        </button>
+                        <div class="absolute right-3 bottom-3 text-xs text-gray-400">
+                            <span id="char-count">0</span>/1000
+                        </div>
                     </div>
+                    <button
+                        type="submit"
+                        id="send-button"
+                        class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 flex-shrink-0 shadow-md hover:shadow-lg disabled:shadow-none transform hover:-translate-y-0.5 disabled:transform-none disabled:cursor-not-allowed"
+                    >
+                        <svg class="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        <span>Send</span>
+                    </button>
                 </form>
+                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    Your messages are completely anonymous and encrypted
+                </p>
             </div>
         </div>
 
@@ -143,97 +209,310 @@
 
 @push('scripts')
 <script>
-    // Auto-scroll to latest message
-    function scrollToBottom() {
+    let isSending = false;
+    let pollInterval = null;
+
+    // Auto-scroll to latest message with smooth animation
+    function scrollToBottom(smooth = true) {
         const container = document.getElementById('messages-container');
-        container.scrollTop = container.scrollHeight;
+        if (container) {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: smooth ? 'smooth' : 'auto'
+            });
+        }
+    }
+
+    // Show loading indicator
+    function showLoadingIndicator() {
+        const indicator = document.getElementById('loading-indicator');
+        if (indicator) {
+            indicator.classList.remove('hidden');
+            scrollToBottom();
+        }
+    }
+
+    // Hide loading indicator
+    function hideLoadingIndicator() {
+        const indicator = document.getElementById('loading-indicator');
+        if (indicator) {
+            indicator.classList.add('hidden');
+        }
+    }
+
+    // Format time for display
+    function formatTime(date) {
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Create message HTML element
+    function createMessageElement(content, isUser = true) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`;
+        
+        const now = new Date();
+        const timeStr = formatTime(now);
+        
+        if (isUser) {
+            messageDiv.innerHTML = `
+                <div class="max-w-xs sm:max-sm lg:max-w-md bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md rounded-2xl p-4 transition-all duration-200 hover:shadow-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <span class="text-xs font-semibold text-white/90">You</span>
+                        <span class="text-xs text-blue-100">${timeStr}</span>
+                    </div>
+                    <p class="text-sm leading-relaxed">${escapeHtml(content)}</p>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="max-w-xs sm:max-sm lg:max-w-md bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 border border-gray-200 rounded-2xl p-4 transition-all duration-200 hover:shadow-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-6 h-6 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <span class="text-xs font-semibold text-purple-600">Support Team</span>
+                        <span class="text-xs text-gray-500">${timeStr}</span>
+                    </div>
+                    <p class="text-sm leading-relaxed">${escapeHtml(content)}</p>
+                </div>
+            `;
+        }
+        
+        return messageDiv;
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Remove empty state when first message is added
+    function removeEmptyState() {
+        const messagesContainer = document.getElementById('messages-container');
+        const emptyState = messagesContainer.querySelector('.text-center.max-w-md');
+        if (emptyState && emptyState.parentElement.classList.contains('flex')) {
+            emptyState.closest('.flex').remove();
+        }
     }
 
     // Send message via AJAX
-    function sendMessage(event, tag) {
+    async function sendMessage(event, tag) {
         event.preventDefault();
+
+        if (isSending) return;
 
         const form = document.getElementById('chat-form');
         const input = document.getElementById('message-input');
+        const charCount = document.getElementById('char-count');
         const content = input.value.trim();
 
         if (!content) {
             return;
         }
 
-        // Disable submit button
-        const submitBtn = form.querySelector('button[type="submit"]');
+        isSending = true;
+        
+        // Disable submit button and show loading state
+        const submitBtn = document.getElementById('send-button');
+        const originalBtnContent = submitBtn.innerHTML;
         submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Sending...</span>
+        `;
 
-        // Send message
-        fetch(`/chat/${tag}/message`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            },
-            body: JSON.stringify({ content: content })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Clear input
-                input.value = '';
-                input.style.height = 'auto';
+        // Optimistically add message to UI
+        removeEmptyState();
+        const messagesContainer = document.getElementById('messages-container');
+        const userMessage = createMessageElement(content, true);
+        messagesContainer.appendChild(userMessage);
+        
+        // Clear input immediately for better UX
+        input.value = '';
+        input.style.height = 'auto';
+        if (charCount) charCount.textContent = '0';
+        
+        scrollToBottom();
 
-                // Add message to display
-                const messagesContainer = document.getElementById('messages-container');
+        try {
+            // Send message to server
+            const response = await fetch(`/chat/${tag}/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ content: content })
+            });
 
-                // Remove "no messages" state if it exists
-                const noMessages = messagesContainer.querySelector('[class*="flex-1 overflow-y-auto"] > div:has([class*="text-gray-500"])');
-                if (noMessages) {
-                    messagesContainer.innerHTML = '';
-                }
-
-                // Add new message
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'flex justify-end';
-                messageDiv.innerHTML = `
-                    <div class="max-w-xs lg:max-w-md bg-blue-600 text-white rounded-lg p-4">
-                        <p class="text-xs font-semibold opacity-75 mb-1">You</p>
-                        <p class="text-sm">${content}</p>
-                        <p class="text-xs text-blue-200 mt-2">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
-                    </div>
-                `;
-                messagesContainer.appendChild(messageDiv);
-
-                // Scroll to bottom
-                scrollToBottom();
+            const data = await response.json();
+            
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Failed to send message');
             }
-        })
-        .catch(error => {
+
+            // Message sent successfully - scroll to bottom
+            scrollToBottom();
+            
+        } catch (error) {
             console.error('Error sending message:', error);
-            alert('Failed to send message. Please try again.');
-        })
-        .finally(() => {
+            
+            // Show error indicator on the message
+            userMessage.classList.add('opacity-75');
+            userMessage.querySelector('p:last-child').innerHTML += '<br><span class="text-xs text-red-200 mt-1 block">⚠️ Failed to send. Please try again.</span>';
+            
+            // Show user-friendly error
+            showToast('Failed to send message. Please check your connection and try again.', 'error');
+        } finally {
+            // Re-enable submit button
             submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnContent;
+            isSending = false;
             input.focus();
-        });
+        }
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        const bgColor = type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+        const icon = type === 'error' ? '❌' : 'ℹ️';
+        
+        toast.className = `fixed bottom-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in flex items-center gap-2`;
+        toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     // Auto-expand textarea
-    document.getElementById('message-input').addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-    });
-
-    // Copy to clipboard
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Anonymous ID copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy:', err);
+    function autoExpandTextarea() {
+        const textarea = document.getElementById('message-input');
+        if (!textarea) return;
+        
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            
+            // Update character count
+            const charCount = document.getElementById('char-count');
+            if (charCount) {
+                charCount.textContent = this.value.length;
+                if (this.value.length > 900) {
+                    charCount.classList.add('text-red-500');
+                } else {
+                    charCount.classList.remove('text-red-500');
+                }
+            }
         });
     }
 
-    // Initial scroll
-    window.addEventListener('load', scrollToBottom);
+    // Copy to clipboard with better feedback
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Anonymous ID copied to clipboard! ✓', 'info');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            showToast('Failed to copy. Please select and copy manually.', 'error');
+        });
+    }
+
+    // Poll for new messages from admin
+    function startPolling(tag) {
+        let lastMessageCount = document.querySelectorAll('#messages-container .flex').length;
+        
+        pollInterval = setInterval(async () => {
+            if (isSending) return;
+            
+            try {
+                const response = await fetch(`/api/reports/${tag}/messages`);
+                if (!response.ok) return;
+                
+                const data = await response.json();
+                const messages = data.data || [];
+                
+                if (messages.length > lastMessageCount) {
+                    // New messages available
+                    const messagesContainer = document.getElementById('messages-container');
+                    
+                    // Add only new messages
+                    for (let i = lastMessageCount; i < messages.length; i++) {
+                        const msg = messages[i];
+                        const isAdmin = msg.sender_type === 'admin';
+                        const messageEl = createMessageElement(msg.content, !isAdmin);
+                        messagesContainer.appendChild(messageEl);
+                    }
+                    
+                    lastMessageCount = messages.length;
+                    scrollToBottom();
+                    
+                    // Play subtle notification sound (optional)
+                    // You can add a sound file here if desired
+                }
+            } catch (error) {
+                console.error('Polling error:', error);
+            }
+        }, 5000); // Poll every 5 seconds
+    }
+
+    // Stop polling when leaving page
+    function stopPolling() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+        }
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', () => {
+        scrollToBottom(false);
+        autoExpandTextarea();
+        
+        // Get tag from the page if available
+        const tagElement = document.querySelector('code.font-mono');
+        if (tagElement) {
+            const tag = tagElement.textContent;
+            startPolling(tag);
+        }
+    });
+
+    // Clean up on page unload
+    window.addEventListener('beforeunload', stopPolling);
 </script>
+
+<style>
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+}
+</style>
 @endpush
 @endsection
 
