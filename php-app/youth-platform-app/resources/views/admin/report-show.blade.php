@@ -150,74 +150,8 @@
 
     <!-- Two Column Layout: Chat and Info -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Chat Section (2/3 width) -->
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                <div class="px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-bold text-white flex items-center">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                            </svg>
-                            Chat with {{ $report->anonymous_tag ?? 'User' }}
-                        </h2>
-                        <span class="text-purple-100 text-sm">{{ count($messages) }} messages</span>
-                    </div>
-                </div>
-
-                <!-- Messages Container -->
-                <div id="chat-messages" class="h-96 overflow-y-auto p-6 bg-gray-50 space-y-4">
-                    @forelse($messages as $message)
-                        <div class="flex {{ $message->sender_type === 'admin' ? 'justify-end' : 'justify-start' }}">
-                            <div class="max-w-xs lg:max-w-md {{ $message->sender_type === 'admin' ? 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' : 'bg-white text-gray-800 border border-gray-200 rounded-r-lg rounded-bl-lg' }} px-4 py-3 shadow-sm">
-                                <div class="flex items-center mb-1">
-                                    <span class="text-xs font-semibold {{ $message->sender_type === 'admin' ? 'text-blue-100' : 'text-gray-500' }}">
-                                        {{ $message->sender_type === 'admin' ? 'Admin' : ($report->anonymous_tag ?? 'User') }}
-                                    </span>
-                                    <span class="ml-2 text-xs {{ $message->sender_type === 'admin' ? 'text-blue-200' : 'text-gray-400' }}">
-                                        {{ $message->created_at->diffForHumans() }}
-                                    </span>
-                                </div>
-                                <p class="text-sm">{{ $message->content }}</p>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-12">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                            </svg>
-                            <p class="mt-2 text-gray-500">No messages yet</p>
-                            <p class="text-sm text-gray-400">Start a conversation to provide support</p>
-                        </div>
-                    @endforelse
-                </div>
-
-                <!-- Send Message Form -->
-                <div class="px-6 py-4 bg-white border-t border-gray-200">
-                    <form method="POST" action="{{ route('admin.reports.respond', $report->id) }}" class="flex space-x-3">
-                        @csrf
-                        <input
-                            type="text"
-                            name="content"
-                            id="message-content"
-                            placeholder="Type your message to provide help and support..."
-                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                            required
-                            maxlength="1000"
-                        >
-                        <button
-                            type="submit"
-                            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors flex items-center"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                            </svg>
-                            Send
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <!-- Chat Section (2/3 width) - Using Component -->
+        <x-chat.admin-messages :report="$report" :messages="$messages" />
 
         <!-- Info Sidebar (1/3 width) -->
         <div class="space-y-4">
