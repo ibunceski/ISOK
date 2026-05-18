@@ -57,7 +57,7 @@
                 <button
                     type="submit"
                     id="admin-send-button"
-                    class="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors flex items-center shadow-md hover:shadow-lg disabled:shadow-none disabled:cursor-not-allowed"
+                    class="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-lg transition-all duration-200 flex items-center shadow-md hover:shadow-lg disabled:shadow-none disabled:cursor-not-allowed transform hover:-translate-y-0.5 disabled:transform-none"
                 >
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
@@ -132,11 +132,13 @@
         `;
 
         try {
-            const response = await fetch(`/api/admin/reports/${reportId}/respond`, {
+            // Use web route instead of API route since admin uses session auth
+            const response = await fetch(`/admin/reports/${reportId}/respond`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
                 },
                 body: JSON.stringify({ content: content })
             });
