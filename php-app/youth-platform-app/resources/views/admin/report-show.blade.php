@@ -175,14 +175,14 @@
                                         {{ $message->sender_type === 'admin' ? 'Admin' : ($report->anonymous_tag ?? 'User') }}
                                     </span>
                                     <span class="ml-2 text-xs {{ $message->sender_type === 'admin' ? 'text-blue-200' : 'text-gray-400' }}">
-                                        {{ $message->created_at->diffForHumans() }}
+                                        {{ $message->created_at->format('H:i') }}
                                     </span>
                                 </div>
                                 <p class="text-sm">{{ $message->content }}</p>
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-12">
+                        <div id="empty-state" class="text-center py-12">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                             </svg>
@@ -194,7 +194,7 @@
 
                 <!-- Send Message Form -->
                 <div class="px-6 py-4 bg-white border-t border-gray-200">
-                    <form method="POST" action="{{ route('admin.reports.respond', $report->id) }}" class="flex space-x-3">
+                    <form id="admin-chat-form" class="flex space-x-3">
                         @csrf
                         <input
                             type="text"
@@ -204,10 +204,12 @@
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                             required
                             maxlength="1000"
+                            autocomplete="off"
                         >
                         <button
                             type="submit"
-                            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors flex items-center"
+                            id="admin-send-btn"
+                            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors flex items-center"
                         >
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
@@ -215,6 +217,7 @@
                             Send
                         </button>
                     </form>
+                    <p id="admin-chat-error" class="hidden text-xs text-red-600 mt-2">Failed to send. Please try again.</p>
                 </div>
             </div>
         </div>
@@ -281,13 +284,113 @@
 
 @push('scripts')
 <script>
-    // Auto-scroll to bottom of chat
-    document.addEventListener('DOMContentLoaded', function() {
-        const chatContainer = document.getElementById('chat-messages');
-        if (chatContainer) {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+    const reportId = {{ $report->id }};
+    const anonymousTag = '{{ $report->anonymous_tag ?? '' }}';
+    let adminLastMessageId = {{ $messages->last() ? $messages->last()->id : 0 }};
+    let adminPollInterval = null;
+    let adminIsSending = false;
+
+    function scrollChatToBottom() {
+        const container = document.getElementById('chat-messages');
+        if (container) container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function removeEmptyState() {
+        const el = document.getElementById('empty-state');
+        if (el) el.remove();
+    }
+
+    function appendMessage(msg) {
+        removeEmptyState();
+        const isAdmin = msg.sender_type === 'admin';
+        const container = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = `flex ${isAdmin ? 'justify-end' : 'justify-start'}`;
+        div.innerHTML = `
+            <div class="max-w-xs lg:max-w-md ${isAdmin ? 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' : 'bg-white text-gray-800 border border-gray-200 rounded-r-lg rounded-bl-lg'} px-4 py-3 shadow-sm">
+                <div class="flex items-center mb-1">
+                    <span class="text-xs font-semibold ${isAdmin ? 'text-blue-100' : 'text-gray-500'}">
+                        ${isAdmin ? 'Admin' : escapeHtml(anonymousTag || 'User')}
+                    </span>
+                    <span class="ml-2 text-xs ${isAdmin ? 'text-blue-200' : 'text-gray-400'}">${escapeHtml(msg.created_at)}</span>
+                </div>
+                <p class="text-sm">${escapeHtml(msg.content)}</p>
+            </div>`;
+        container.appendChild(div);
+        scrollChatToBottom();
+    }
+
+    async function pollMessages() {
+        try {
+            const response = await fetch(`/admin/reports/${reportId}/messages?after_id=${adminLastMessageId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!response.ok) return;
+
+            const data = await response.json();
+            for (const msg of (data.data || [])) {
+                appendMessage(msg);
+                adminLastMessageId = msg.id;
+            }
+        } catch (e) {
+            // silently ignore poll errors
         }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        scrollChatToBottom();
+
+        document.getElementById('admin-chat-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            if (adminIsSending) return;
+
+            const input = document.getElementById('message-content');
+            const content = input.value.trim();
+            if (!content) return;
+
+            adminIsSending = true;
+            const btn = document.getElementById('admin-send-btn');
+            const errEl = document.getElementById('admin-chat-error');
+            btn.disabled = true;
+            errEl.classList.add('hidden');
+
+            try {
+                const response = await fetch(`/admin/reports/${reportId}/respond`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ content })
+                });
+
+                const data = await response.json();
+                if (!response.ok || !data.success) throw new Error(data.message || 'Failed');
+
+                input.value = '';
+                appendMessage(data.data);
+                adminLastMessageId = data.data.id;
+            } catch (err) {
+                console.error('Send error:', err);
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                adminIsSending = false;
+                input.focus();
+            }
+        });
+
+        adminPollInterval = setInterval(pollMessages, 3000);
     });
+
+    window.addEventListener('beforeunload', () => clearInterval(adminPollInterval));
 </script>
 @endpush
 @endsection

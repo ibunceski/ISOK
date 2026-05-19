@@ -117,6 +117,71 @@
             </div>
         </div>
 
+        <!-- Come Back to Your Chat -->
+        <div class="mt-8 bg-white rounded-xl shadow-lg border border-green-200 overflow-hidden">
+            <div class="px-6 py-5 bg-gradient-to-r from-green-50 to-teal-50 border-b border-green-200">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">Already shared something with us?</h2>
+                        <p class="text-sm text-gray-600 mt-0.5">Enter your secret code to go back to your chat and see our reply.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                @if(session('chat_lookup_error'))
+                    <div class="mb-5 bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-start gap-3">
+                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-orange-800">Hmm, we couldn't find that code!</p>
+                            <p class="text-sm text-orange-700 mt-1">Please check the letters and numbers and try again. Your secret code looks something like <strong>USER-ABCD1234</strong>.</p>
+                        </div>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('chat.lookup') }}">
+                    @csrf
+                    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+                        <div class="flex-1 w-full">
+                            <label for="tag" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Your secret code
+                            </label>
+                            <input
+                                type="text"
+                                id="tag"
+                                name="tag"
+                                value="{{ old('tag') }}"
+                                placeholder="e.g. USER-ABCD1234"
+                                class="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors tracking-widest font-mono"
+                                autocomplete="off"
+                                maxlength="20"
+                                oninput="this.value = this.value.toUpperCase()"
+                            >
+                            <p class="mt-2 text-xs text-gray-500">This is the code you saved when you first shared your report with us.</p>
+                        </div>
+                        <button
+                            type="submit"
+                            class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-7 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center justify-center gap-2 text-base whitespace-nowrap"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            Go to my chat
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Emergency Notice -->
         <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
             <div class="flex items-start">

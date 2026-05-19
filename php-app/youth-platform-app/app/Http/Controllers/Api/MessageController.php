@@ -20,8 +20,9 @@ class MessageController extends Controller
 
     /**
      * Get all messages for a report using anonymous tag.
+     * Supports ?after_id=X to return only messages newer than that ID.
      */
-    public function getMessages(string $anonymousTag): JsonResponse
+    public function getMessages(string $anonymousTag, Request $request): JsonResponse
     {
         $report = Report::where('anonymous_tag', $anonymousTag)->first();
 
@@ -31,15 +32,21 @@ class MessageController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
-        $messages = $this->chatService->getReportMessages($report)
-            ->map(function ($message) {
-                return [
-                    'id' => $message->id,
-                    'content' => $message->content,
-                    'sender_type' => $message->sender_type,
-                    'created_at' => $message->created_at,
-                ];
-            });
+        $afterId = (int) $request->get('after_id', 0);
+
+        $query = $report->messages()->orderBy('created_at', 'asc');
+        if ($afterId > 0) {
+            $query->where('id', '>', $afterId);
+        }
+
+        $messages = $query->get()->map(function ($message) {
+            return [
+                'id' => $message->id,
+                'content' => $message->content,
+                'sender_type' => $message->sender_type,
+                'created_at' => $message->created_at,
+            ];
+        });
 
         return response()->json([
             'data' => $messages,

@@ -1,0 +1,6 @@
+torch --index-url https://download.pytorch.org/whl/cpu
+fastapi~=0.129.0
+pydantic~=2.12.5
+transformers~=5.1.0
+uvicorn
+openai~=2.37.0
