@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Repositories\ReportRepository;
 use App\Services\ChatService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -78,9 +79,38 @@ class DashboardController extends Controller
     }
 
     /**
+     * Return messages for a report as JSON (for polling).
+     * Supports ?after_id=X to return only messages newer than that ID.
+     */
+    public function getMessages(Request $request, int $id): JsonResponse
+    {
+        $report = $this->repository->findById($id);
+
+        if (!$report) {
+            return response()->json(['message' => 'Report not found'], 404);
+        }
+
+        $afterId = (int) $request->get('after_id', 0);
+
+        $query = $report->messages()->orderBy('created_at', 'asc');
+        if ($afterId > 0) {
+            $query->where('id', '>', $afterId);
+        }
+
+        $messages = $query->get()->map(fn($m) => [
+            'id' => $m->id,
+            'content' => $m->content,
+            'sender_type' => $m->sender_type,
+            'created_at' => $m->created_at->format('H:i'),
+        ]);
+
+        return response()->json(['data' => $messages]);
+    }
+
+    /**
      * Send admin response to a report.
      */
-    public function sendResponse(Request $request, int $reportId): RedirectResponse
+    public function sendResponse(Request $request, int $reportId): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string|min:1|max:1000',
@@ -89,17 +119,30 @@ class DashboardController extends Controller
         $report = $this->repository->findById($reportId);
 
         if (!$report) {
-            return redirect()->back()
-                ->with('error', 'Report not found.');
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Report not found'], 404);
+            }
+            return redirect()->back()->with('error', 'Report not found.');
         }
 
-        $this->chatService->adminRespond(
+        $message = $this->chatService->adminRespond(
             $report,
             auth()->id(),
             $validated['content']
         );
 
-        return redirect()->back()
-            ->with('success', 'Response sent successfully.');
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $message->id,
+                    'content' => $message->content,
+                    'sender_type' => $message->sender_type,
+                    'created_at' => $message->created_at->format('H:i'),
+                ],
+            ], 201);
+        }
+
+        return redirect()->back()->with('success', 'Response sent successfully.');
     }
 }

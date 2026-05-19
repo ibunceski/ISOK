@@ -1,0 +1,43 @@
+# Development artefacts — never needed inside the image
+.git
+.gitignore
+.gitattributes
+.editorconfig
+
+# Local env files (secrets injected at runtime via docker-compose)
+.env
+.env.*
+!.env.example
+
+# Tooling configs
+.idea
+.vscode
+.phpactor.json
+aider.conf.yml
+
+# Dependency directories (rebuilt inside Docker)
+vendor
+node_modules
+
+# Built frontend assets (rebuilt inside Docker)
+public/build
+public/hot
+public/storage
+
+# Runtime artefacts
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+
+# Bootstrap cache — built locally with dev packages, must not enter the image.
+# Regenerated at container start by `php artisan package:discover`.
+bootstrap/cache/*.php
+
+# Test / CI
+.phpunit.cache
+.phpunit.result.cache
+tests
+
+# Documentation
+*.md
