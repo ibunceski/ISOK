@@ -26,9 +26,6 @@
                                 <a href="{{ route('admin.dashboard') }}" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                     Dashboard
                                 </a>
-                                <a href="{{ route('admin.reports.index') }}" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                    Reports
-                                </a>
                             </div>
                         @endif
                     @else
