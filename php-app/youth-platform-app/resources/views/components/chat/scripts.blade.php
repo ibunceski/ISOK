@@ -162,6 +162,10 @@ window.chatUtils = (function() {
 
             // Message sent successfully - scroll to bottom
             scrollToBottom();
+
+            // Poll immediately to get any responses from admin
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await startPolling(tag);
         } catch (error) {
             console.error('Error sending message:', error);
 
@@ -260,7 +264,7 @@ window.chatUtils = (function() {
     function init(tag) {
         scrollToBottom(false);
         initTextareaAutoExpand();
-        
+
         if (tag) {
             startPolling(tag);
         }

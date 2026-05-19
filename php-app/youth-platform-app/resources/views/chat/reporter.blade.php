@@ -31,15 +31,6 @@
                 </svg>
                 Submit Another Report
             </a>
-            <a
-                href="{{ route('home') }}"
-                class="inline-flex items-center px-6 py-3 bg-gray-700 hover:bg-gray-800 border-2 border-gray-700 text-white font-semibold rounded-lg transition-colors shadow-md"
-            >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12a9 9 0 010-18 9 9 0 010 18zM3 12h18"/>
-                </svg>
-                Home
-            </a>
         </div>
     </div>
 </div>
